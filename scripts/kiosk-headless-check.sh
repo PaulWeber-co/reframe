@@ -38,11 +38,17 @@ for i in $(seq 1 40); do
 done
 [ -S "$XDG_RUNTIME_DIR/wayland-0" ] || { echo "cage did not create a Wayland socket:"; cat "$work/kiosk.log"; exit 1; }
 
-sleep 12 # Chromium starts and the page draws
-WAYLAND_DISPLAY=wayland-0 grim "$work/screen.png"
-size="$(wc -c <"$work/screen.png")"
+# Chromium starts and the page draws: look every few seconds, for up to a
+# minute, because a slow machine needs longer than a fast one. A blank screen
+# compresses to a few kilobytes; the dashboard is far bigger.
+size=0
+for i in $(seq 1 20); do
+	sleep 3
+	WAYLAND_DISPLAY=wayland-0 grim "$work/screen.png" 2>/dev/null || continue
+	size="$(wc -c <"$work/screen.png")"
+	[ "$size" -ge 100000 ] && break
+done
 echo "the compositor's screenshot is $size bytes"
-# A blank screen compresses to a few kilobytes; the dashboard is far bigger
 if [ "$size" -lt 100000 ]; then
 	echo "the screen looks empty"
 	cat "$work/kiosk.log"
