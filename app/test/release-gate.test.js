@@ -23,6 +23,8 @@ test('ordinary text passes', () => {
   assert.equal(found('Co-authored by noreply@anthropic.com'), 0);
   assert.equal(found('git config user.email 12345+name@users.noreply.github.com'), 0);
   assert.equal(found('contact: you@example.com'), 0);
+  assert.equal(found('Signed-off-by: dependabot[bot] <support@github.com>'), 0);
+  assert.equal(found('mail me at paul@github.com'), 1);
   assert.equal(found("host 'evil.example:7777@reframe.local' is refused"), 0, 'a host name with userinfo, not an address');
   assert.equal(found('curl http://umbrel.local:2283'), 0);
 });
