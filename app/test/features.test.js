@@ -157,3 +157,16 @@ test('stale or future ambient readings are unavailable and cannot enable night m
     });
   }
 });
+
+test('software dimming: the page darkens itself by what the backlight would have been', async () => {
+  const { dimOpacity } = await import(new URL('../web/js/features/display.js', import.meta.url).href);
+  assert.equal(dimOpacity(100), 0);
+  assert.equal(dimOpacity(70), 0.3);
+  assert.equal(dimOpacity(50), 0.5);
+  assert.equal(dimOpacity(8), 0.88, 'never fully dark');
+  assert.equal(dimOpacity(0), 0.88);
+  for (const nothing of [null, undefined, NaN, 'bright']) assert.equal(dimOpacity(nothing), 0, String(nothing));
+  const css = readFileSync(new URL('../web/css/dashboard.css', import.meta.url), 'utf8');
+  assert.match(css, /\.dimmer \{[^}]*opacity: var\(--dim, 0\)/);
+  assert.match(css, /data-display="off"\] \.sleep/, 'off is a black screen too when the panel cannot be switched off');
+});

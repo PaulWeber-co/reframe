@@ -116,10 +116,27 @@ class BacklightTests(TempDir):
         agent.apply_backlight({"backlight": "auto"})
         self.assertEqual((device / "brightness").read_text(), before, "no flicker for a tiny change")
 
-    def test_a_machine_without_backlight_is_fine(self):
+    def test_a_machine_without_backlight_dims_in_software(self):
         agent = host.Agent(host_state=self.dir / "x.json", run_dir=self.dir, kiosk=SimpleNamespace(), sysfs=self.dir / "none", blank=self.dir / "blank")
         agent.apply_backlight({"backlight": 50})
-        self.assertIsNone(agent.backlight_percent)
+        self.assertEqual((agent.control, agent.software_dim, agent.backlight_percent), ("software", 50, 50))
+        agent.apply_backlight({"backlight": "off"})
+        self.assertIsNone(agent.software_dim, "off is the page's black screen, not a dim level")
+        agent.apply_backlight({"backlight": "auto"})
+        self.assertIsNone(agent.software_dim, "no room reading: nothing to follow, so no dimming")
+        (self.dir / "ambient.json").write_text(json.dumps({"available": True, "level": 255, "capturedAt": int(time.time() * 1000), "intervalSeconds": 45}))
+        agent.apply_backlight({"backlight": "auto"})
+        self.assertEqual(agent.software_dim, host.MAX_BACKLIGHT, "with a reading it follows the room")
+
+    def test_a_read_only_sys_means_software_too(self):
+        agent, device = self.agent()
+        real_access = os.access
+        os.access = lambda path, mode, *a, **k: False if str(path).startswith(str(self.dir / "sys")) and mode == os.W_OK else real_access(path, mode, *a, **k)
+        self.addCleanup(setattr, os, "access", real_access)
+        agent.apply_backlight({"backlight": 40})
+        self.assertEqual((agent.control, agent.software_dim), ("software", 40))
+        self.assertEqual((device / "brightness").read_text().strip(), "100", "nothing was written")
+        self.assertFalse(agent.can_power_down())
 
 
 class KioskTests(TempDir):
@@ -170,6 +187,17 @@ class KioskTests(TempDir):
         self.assertFalse(agent.kiosk.running())
         self.assertEqual(json.loads((self.dir / "run" / "status.json").read_text())["kiosk"], "stopped")
         self.assertEqual((self.dir / "blank").read_text().strip(), "4", "the panel is blanked while the kiosk is off")
+
+    def test_without_a_way_to_power_down_off_keeps_the_browser_running(self):
+        script = self.script("exec sleep 60")
+        agent = host.Agent(host_state=self.dir / "host-state.json", run_dir=self.dir / "run", kiosk=host.Kiosk(script), sysfs=self.dir / "none", blank=self.dir / "no-blank")
+        self.addCleanup(agent.shutdown)
+        self.write("host-state.json", {"display": "off", "kiosk": False, "backlight": "off", "camera": False})
+        agent.step(now=5.0)
+        self.assertTrue(agent.kiosk.running(), "the page shows black instead")
+        status = json.loads((self.dir / "run" / "status.json").read_text())
+        self.assertEqual((status["powerDown"], status["backlightControl"], status["softwareDim"]), (False, "software", None))
+        self.assertEqual(status["wish"]["kiosk"], False, "the wish is reported as it was")
 
     def test_a_missing_file_means_everything_on(self):
         agent = host.Agent(host_state=self.dir / "nothing.json", run_dir=self.dir / "run", kiosk=host.Kiosk(self.script("exec sleep 60")), sysfs=self.dir / "none", blank=self.dir / "blank")

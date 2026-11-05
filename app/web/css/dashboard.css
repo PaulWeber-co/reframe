@@ -171,6 +171,7 @@ button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .editbar .add { display: flex; gap: 8px; }
 .editbar .add button { background: rgba(255, 255, 255, .16); color: #fff; }
 .editbar .done { background: #fff; color: #111; }
+.dimmer { position: absolute; inset: 0; z-index: 29; background: #000; opacity: var(--dim, 0); pointer-events: none; transition: opacity 1.5s ease; }
 .settings-toggle { position: absolute; right: 32px; bottom: 32px; z-index: 31; width: 60px; height: 60px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, .32); border-radius: 50%; color: #fff; background: linear-gradient(145deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .08)), rgba(10, 17, 25, .48); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32), 0 12px 30px -20px rgba(0, 0, 0, .8); backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); cursor: pointer; }
 .settings-toggle .ic { width: 26px; height: 26px; }
 .settings-toggle:hover { background-color: rgba(255, 255, 255, .18); }
@@ -179,7 +180,7 @@ button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ---------- sleep: the control center turned the wall black (kiosk only) ---------- */
 .sleep { position: absolute; inset: 0; z-index: 70; background: #000; opacity: 0; visibility: hidden; transition: opacity 1s ease, visibility 0s linear 1s; }
-.stage[data-display="sleep"] .sleep { opacity: 1; visibility: visible; cursor: none; transition: opacity 1.4s ease; }
+.stage[data-display="sleep"] .sleep, .stage[data-display="off"] .sleep { opacity: 1; visibility: visible; cursor: none; transition: opacity 1.4s ease; }
 
 /* ---------- night view: clock only, very dark ---------- */
 .night { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: #000; color: #ff9f5f; opacity: 0; visibility: hidden; transition: opacity 1.2s ease, visibility 0s linear 1.2s; z-index: 40; }

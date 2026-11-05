@@ -16,6 +16,14 @@ import { $ } from '../util.js';
 
 const AWAY_STATES = new Set(['night', 'sleep', 'off']);
 
+// A container without access to /sys cannot set the backlight: the agent then
+// reports softwareDim (the brightness it would have set, in percent) and the
+// kiosk page darkens itself with a black layer. Never fully dark: 88 % at most.
+export function dimOpacity(softwareDim) {
+  if (!Number.isFinite(softwareDim)) return 0;
+  return Math.round(Math.min(0.88, Math.max(0, 1 - softwareDim / 100)) * 100) / 100;
+}
+
 export function init({ stage, kiosk, scenes, onControl, setSceneOverride }) {
   let display = 'on';
   let touchWake = 0;
@@ -30,6 +38,7 @@ export function init({ stage, kiosk, scenes, onControl, setSceneOverride }) {
     display = snapshot?.effective?.display ?? 'on';
     touchWake = settings?.rules?.touchWake ?? 0;
     stage.dataset.display = kiosk ? display : 'on';
+    stage.style.setProperty('--dim', String(kiosk ? dimOpacity(snapshot?.status?.softwareDim) : 0));
     stage.dataset.musicmode = settings?.features?.musicMode === false ? '0' : '1';
     const dark = kiosk && (display === 'sleep' || display === 'off');
     const motion = settings?.features?.videos !== false && !dark;

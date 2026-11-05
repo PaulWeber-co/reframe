@@ -336,7 +336,7 @@ export function createPanel(root, { getState, onControl, onAccess = () => {}, on
     const rows = [
       [t('control.system.kiosk'), status ? unitState(status.kiosk) : '–'],
       [t('control.system.camera'), !host.camera ? t('control.system.off') : ambient?.available ? t('control.system.measuring', { percent: ambient.ambientPercent }) : t('control.system.on')],
-      [t('control.system.brightness'), Number.isFinite(status?.backlightPercent) ? `${status.backlightPercent} %` : '–'],
+      [t('control.system.brightness'), Number.isFinite(status?.backlightPercent) ? (status.backlightControl === 'software' ? t('control.system.software', { percent: status.backlightPercent }) : `${status.backlightPercent} %`) : '–'],
       [t('control.system.power'), inputs.onBattery === true ? t('control.system.battery') : inputs.onBattery === false ? t('control.system.mains') : '–'],
       [t('control.system.music'), inputs.musicActive ? t('control.system.playing') : t('control.system.quiet')],
     ];
@@ -344,6 +344,7 @@ export function createPanel(root, { getState, onControl, onAccess = () => {}, on
       <section class="cp-card">
         <h3>${esc(t('control.system'))}</h3>
         <dl class="cp-facts">${rows.map(([name, value]) => `<div><dt>${esc(name)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
+        ${status?.powerDown === false ? `<p class="cp-note">${esc(t('control.system.noPowerDown'))}</p>` : ''}
         ${status ? '' : `<p class="cp-note">${state.demo ? `${esc(t('control.system.demo'))} ` : ''}${esc(t('control.system.noHost'))}</p>`}
       </section>`;
   }

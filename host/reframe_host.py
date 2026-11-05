@@ -12,6 +12,11 @@ kiosk container, is the only part that acts on it:
              a number is a fixed percentage, "off" switches the backlight off
   camera     read by reframe_ambient itself: no measurement while it is false
 
+A container without privileges cannot write to /sys, so it can neither set the
+backlight nor power the panel down. The agent notices and falls back: the
+brightness it would have set goes to the page as "softwareDim" (the kiosk page
+darkens itself), and "off" keeps the browser running so the page shows black.
+
 Every value is validated, so the dashboard can never ask for more than these
 switches. A missing or broken file means "everything on". What actually runs
 goes to <run dir>/status.json, which the control center shows.
@@ -125,6 +130,8 @@ def write_if_different(path, value):
             return False
         path.write_text(f"{value}\n")
         return True
+    except FileNotFoundError:
+        return False  # this machine has no such switch
     except OSError as error:
         log(f"{path}: {error}")
         return False
@@ -190,30 +197,54 @@ class Agent:
         self.applied = None
         self.last_level = None  # the last good room reading, a guess after a wake-up
         self.backlight_percent = None
+        self.control = "hardware"  # "software": the page dims itself, see apply_backlight
+        self.software_dim = None
+        self.power_down = True
         self.kiosk_state = "stopped"
         self.last_status = None
         self.status_written = 0.0
 
+    def can_power_down(self):
+        """Can this container switch the panel off (backlight or framebuffer)?"""
+        device = backlight_device(self.sysfs)
+        if device is not None and os.access(device / "brightness", os.W_OK):
+            return True
+        return os.access(self.blank, os.W_OK)
+
     def apply_kiosk(self, wish, now):
-        if self.applied is None or self.applied["kiosk"] != wish["kiosk"]:
-            if wish["kiosk"]:
+        # Without a way to power the panel down, "off" would only leave the last
+        # picture on a lit screen: keep the browser running, the page shows black
+        run = wish["kiosk"] or not self.power_down
+        if self.applied is None or self.applied["kiosk"] != run:
+            if run:
                 write_if_different(self.blank, 0)
                 self.kiosk.retry_at = 0.0
             else:
                 self.kiosk.stop()
                 write_if_different(self.blank, 4)
-            log(f"kiosk {'on' if wish['kiosk'] else 'off'}")
-        self.kiosk_state = self.kiosk.keep_alive(now) if wish["kiosk"] else "stopped"
+            log(f"kiosk {'on' if run else 'off'}")
+        self.kiosk_state = self.kiosk.keep_alive(now) if run else "stopped"
 
     def apply_backlight(self, wish):
         level = ambient_level(self.run_dir / "ambient.json")
         if level is not None:
             self.last_level = level
         setting = wish["backlight"]
+        percent = None
+        if setting != "off":
+            percent = curve_percent(self.last_level) if setting == "auto" and self.last_level is not None else FALLBACK_BACKLIGHT if setting == "auto" else setting
         device = backlight_device(self.sysfs)
-        if device is None:
-            self.backlight_percent = None
+        if device is None or not os.access(device / "brightness", os.W_OK):
+            # No backlight, or a read-only /sys: the page darkens itself. Without a
+            # room reading there is nothing to follow, and a made-up 50 percent
+            # would leave the wall dim for no reason: then it does not dim
+            self.control = "software"
+            blind = setting == "auto" and self.last_level is None
+            self.software_dim = None if blind else percent
+            self.backlight_percent = self.software_dim
             return
+        self.control = "hardware"
+        self.software_dim = None
         try:
             maximum = int((device / "max_brightness").read_text().strip())
             current = int((device / "brightness").read_text().strip())
@@ -223,14 +254,7 @@ class Agent:
         if maximum <= 0:
             return
         power = device / "bl_power"
-        if setting == "off":
-            target = 0
-        else:
-            if setting == "auto":
-                percent = curve_percent(self.last_level) if self.last_level is not None else FALLBACK_BACKLIGHT
-            else:
-                percent = setting
-            target = max(1, round(maximum * percent / 100))
+        target = 0 if percent is None else max(1, round(maximum * percent / 100))
         if power.is_file():
             write_if_different(power, 4 if setting == "off" else 0)
         # Small changes are skipped, so the panel does not flicker between readings
@@ -244,6 +268,9 @@ class Agent:
             "wish": self.applied,
             "kiosk": self.kiosk_state,
             "backlightPercent": self.backlight_percent,
+            "backlightControl": self.control,
+            "softwareDim": self.software_dim,
+            "powerDown": self.power_down,
             "ambientLevel": self.last_level,
         }
         if status == self.last_status and now - self.status_written < STATUS_REFRESH_SECONDS:
@@ -268,6 +295,7 @@ class Agent:
     def step(self, now=None):
         now = time.monotonic() if now is None else now
         wish = normalize_wish(read_json(self.host_state))
+        self.power_down = self.can_power_down()
         self.apply_kiosk(wish, now)
         self.applied = wish
         self.apply_backlight(wish)
