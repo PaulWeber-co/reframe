@@ -297,7 +297,7 @@ async function serveFile(req, res, root, relative, cacheControl) {
   const type = extname(file).toLowerCase();
   const headers = {
     ...SECURITY_HEADERS,
-    ...(type === '.html' ? { 'content-security-policy': CSP } : {}),
+    ...(type === '.html' || type === '.svg' ? { 'content-security-policy': CSP } : {}),
     'content-type': TYPES[type] ?? 'application/octet-stream',
     'accept-ranges': 'bytes',
     'cache-control': cacheControl,
