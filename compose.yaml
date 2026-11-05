@@ -2,6 +2,7 @@
 #
 #   docker compose up -d                      the dashboard at http://localhost:7777
 #   docker compose --profile kiosk up -d      ... and on this machine's own display
+#                                             (kiosk-full: the same with full rights, if kiosk does not work)
 #   docker compose --profile airplay up -d    ... plus an AirPlay speaker
 #   docker compose --profile services up -d   ... plus the Services tile
 #
@@ -34,13 +35,44 @@ services:
     security_opt:
       - no-new-privileges:true
 
-  # The kiosk: Chromium full screen on this laptop's display, plus brightness
-  # and the optional webcam sensor. It shares the dashboard's network (so the
-  # page loads from 127.0.0.1) and its data. It needs the machine's display,
-  # input and sound devices, so it runs privileged: see docs/hardware.md.
+  # The kiosk: Chromium full screen on this laptop's display. It runs with as few
+  # rights as possible: no privileged mode, no capabilities, only the graphics
+  # card and the input devices, and the udev database (read-only) that tells the
+  # compositor what a device is. It shares the dashboard's network (so the page
+  # loads from 127.0.0.1) and its data. Brightness is dimmed in the page, since
+  # a container cannot write to /sys: scripts/backlight-mount.sh prints the lines
+  # that give it the real backlight. Add `- /dev/video0:/dev/video0` under
+  # devices for the webcam sensor. If your machine does not accept this, use
+  # kiosk-full below. See docs/hardware.md. Use one of the two, not both.
   kiosk:
     <<: *image
     profiles: ["kiosk"]
+    command: kiosk
+    restart: unless-stopped
+    network_mode: "service:reframe"
+    depends_on:
+      - reframe
+    environment:
+      REFRAME_KIOSK_SEAT: noop
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/input:/dev/input
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - data:/data
+      - run:/run/reframe
+      - /run/udev:/run/udev:ro
+
+  # The same kiosk with full rights: a seat daemon takes the display over
+  # properly (including the virtual console), the backlight and the webcam are
+  # reachable. Needs a privileged container, so only use it when `kiosk` does
+  # not work on your machine.
+  kiosk-full:
+    <<: *image
+    profiles: ["kiosk-full"]
     command: kiosk
     restart: unless-stopped
     network_mode: "service:reframe"
@@ -48,6 +80,8 @@ services:
     tty: true
     depends_on:
       - reframe
+    environment:
+      REFRAME_KIOSK_SEAT: seatd
     volumes:
       - data:/data
       - run:/run/reframe
