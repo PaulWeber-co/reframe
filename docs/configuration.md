@@ -38,11 +38,20 @@ The kiosk container reads these (all optional):
 | Variable | What | Default |
 | --- | --- | --- |
 | `REFRAME_BACKLIGHT_MIN_PERCENT`, `REFRAME_BACKLIGHT_MAX_PERCENT`, `REFRAME_BACKLIGHT_GAMMA`, `REFRAME_BACKLIGHT_FALLBACK_PERCENT` | the automatic brightness curve | `8`, `85`, `0.65`, `50` |
-| `REFRAME_BACKLIGHT_PATH` | a specific `/sys/class/backlight/...` folder | the first one |
+| `REFRAME_BACKLIGHT_PATH` | a specific backlight folder; `scripts/backlight-mount.sh` mounts the real one at `/backlight` | the first in `/sys/class/backlight` |
 | `REFRAME_AMBIENT` | `off` keeps the webcam sensor off | on, if there is a camera |
 | `REFRAME_AMBIENT_INTERVAL`, `REFRAME_AMBIENT_DARK_INTERVAL` | seconds between measurements, in light and in the dark | `45`, `120` |
 | `REFRAME_AMBIENT_DARK_ON`, `REFRAME_AMBIENT_DARK_OFF` | grey level 0 to 255 that counts as dark, and as light again | `16`, `25` |
 | `REFRAME_CAMERA_DEVICE`, `REFRAME_CAMERA_EXPOSURE`, `REFRAME_CAMERA_GAIN` | which camera, and its fixed exposure and gain | `/dev/video0`, `156`, `0` |
+
+The kiosk script reads:
+
+| Variable | What | Default |
+| --- | --- | --- |
+| `REFRAME_KIOSK_SEAT` | `noop` (no seat daemon, no privileges) or `seatd` (privileged, `kiosk-full`) | `noop` |
+| `REFRAME_KIOSK_URL` | the page the kiosk shows | `http://127.0.0.1:7777/?kiosk=1` |
+| `REFRAME_CHROMIUM` | the browser binary | `chromium` |
+| `REFRAME_KIOSK_HEADLESS` | `1`: no display, software rendering, for tests | off |
 
 Set them in a `compose.override.yaml` next to `compose.yaml`:
 

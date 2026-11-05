@@ -75,11 +75,14 @@ Debian or Ubuntu, or umbrelOS):
 docker compose --profile kiosk up -d
 ```
 
-That starts Chromium full screen on the laptop's display and takes care of
-brightness and the webcam sensor. Add `--profile airplay` for the AirPlay
-speaker and `--profile services` for the Services tile. The kiosk container is
-privileged; [docs/hardware.md](docs/hardware.md) explains why, what to check
-first, and how to report what worked on your machine.
+That starts Chromium full screen on the laptop's display. It runs **without a
+privileged container**: only the graphics card and the input devices are handed
+in, and brightness is dimmed in the page. If your machine does not accept that,
+`--profile kiosk-full` is the same with full rights (real backlight, webcam
+sensor, powering the panel down). Add `--profile airplay` for the AirPlay
+speaker and `--profile services` for the Services tile.
+[docs/hardware.md](docs/hardware.md) explains how it works, what to check first,
+and how to report what worked on your machine.
 
 ## On umbrelOS
 
@@ -91,8 +94,9 @@ https://github.com/PaulWeber-co/reframe
 ```
 
 Then install **Reframe** (the dashboard, for any browser) or **Reframe Display**
-(the dashboard plus the kiosk, brightness and an AirPlay speaker for the machine
-Umbrel runs on). Details and the honest list of what is untested:
+(the dashboard plus the kiosk and an AirPlay speaker for the machine Umbrel runs
+on; no privileged container, the graphics card comes from Umbrel's GPU
+permission). Details, what is verified and what Umbrel's own store rules say:
 [docs/umbrel.md](docs/umbrel.md).
 
 ## Your own video
@@ -132,7 +136,8 @@ center. Writing your own tile takes two files: [docs/widgets.md](docs/widgets.md
 | --- | --- |
 | Dashboard, setup, control center, to-dos, widgets | tested: about 200 unit tests, host-helper tests and a smoke test, all in CI |
 | Container files, compose profiles, Umbrel app files | validated (`docker compose config`), image build in CI |
-| Kiosk on a real display, brightness, webcam | built from established patterns, **not yet verified on hardware** |
+| The kiosk chain (cage without a seat daemon, Chromium, the scripts) | verified without a screen, in CI (`scripts/kiosk-headless-check.sh`) |
+| Taking over a real display, touch, brightness, webcam | built from established patterns, **not yet verified on hardware** |
 | AirPlay from a phone | the same setup that ran on a real machine, **not yet verified in this form** |
 | Installing the Umbrel apps on umbrelOS | **not yet verified** |
 

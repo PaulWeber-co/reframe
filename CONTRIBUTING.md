@@ -4,9 +4,10 @@ Bug reports, hardware reports and small fixes are welcome.
 
 ## Hardware reports are the most useful thing
 
-The kiosk depends on the laptop. If you tried `docker compose --profile kiosk up`,
-please open an issue with the machine (model, GPU), the OS, what worked and what
-did not, and the output of `docker compose logs kiosk`. The checklist is in
+The kiosk depends on the laptop. If you tried `docker compose --profile kiosk up`
+(or `kiosk-full`), please open an issue with the machine (model, GPU), the OS,
+which profile, what worked and what did not, and the output of
+`docker compose logs kiosk`. The checklist is in
 [docs/hardware.md](docs/hardware.md).
 
 ## Working on the code
@@ -19,6 +20,7 @@ npm run smoke       # starts the real server in demo mode and asks it things
 npm run demo        # look at it: http://localhost:7777
 cd ..
 python3 -m unittest discover -s host/tests    # the host helpers
+scripts/kiosk-headless-check.sh               # the kiosk chain without a screen (needs cage, grim, Chromium)
 node scripts/release-gate.mjs                 # nothing private in the repository
 ```
 

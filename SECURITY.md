@@ -27,11 +27,14 @@ the open internet:
 - **Secrets** (API keys, tokens, calendar links) are saved in
   `/data/config.json`, readable by its owner only, and never sent back to the
   browser. Anyone who can read your Docker volume can read them.
-- **The kiosk container is privileged.** Driving a display, input devices and
-  the backlight from a container needs it. It loads only the dashboard on
+- **The kiosk container has few rights.** The default `kiosk` profile is not
+  privileged and has no capabilities: it gets the graphics card, the input
+  devices and the udev database (read-only), nothing else. The `kiosk-full`
+  profile is privileged (a seat daemon, all of `/dev`) and is only for machines
+  where the first does not work. Either loads only the dashboard on
   `127.0.0.1`. Chromium runs with `--no-sandbox` there, because its sandbox
-  does not work inside a container without extra rights; keep it that way only
-  because it never visits another page.
+  does not work inside a container without extra rights; that is acceptable
+  only because it never visits another page.
 - **The Services tile needs the Docker socket,** which is root on the machine.
   It lives in a container of its own with no network and no capabilities; the
   dashboard never touches it. If that is too much trust for you, leave the

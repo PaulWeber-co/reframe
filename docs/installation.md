@@ -39,9 +39,13 @@ docker compose --profile kiosk up -d
 ```
 
 The laptop's screen turns into the dashboard within a minute. Open
-`http://reframe.local:7777/control` on your phone to set the schedule. Read
-[hardware.md](hardware.md) first if anything does not light up: the kiosk is the
-part that depends on your machine.
+`http://reframe.local:7777/control` on your phone to set the schedule. This
+profile runs without a privileged container; if it does not show anything on
+your machine, try `--profile kiosk-full` instead (privileged, with a seat
+daemon) and read [hardware.md](hardware.md): the kiosk is the part that depends
+on your machine. The real backlight is one command away,
+`scripts/backlight-mount.sh > compose.override.yaml`; otherwise the page dims
+itself.
 
 Useful things for a laptop that now lives on a shelf:
 
@@ -74,6 +78,6 @@ get it.
 ## Uninstall
 
 ```sh
-docker compose --profile kiosk --profile airplay --profile services down
+docker compose --profile kiosk --profile kiosk-full --profile airplay --profile services down
 docker volume rm reframe_data reframe_run reframe_airplay    # also deletes your settings
 ```

@@ -13,10 +13,10 @@
    host-state.json                     │  status.json, ambient.json,
    (what the screen should do)         │  services.json, shairport pipe
 ┌──────────────▼──────────────────────┴─────────────┐
-│ container "kiosk" (profile kiosk)    privileged   │   same network namespace, so the
-│  host agent: starts/stops the kiosk, sets the     │   page loads from 127.0.0.1
-│  backlight, runs the webcam sensor                │
-│  seatd + cage + Chromium ──► the laptop's display │
+│ container "kiosk" (profile kiosk)   few rights    │   same network namespace, so the
+│  host agent: starts/stops the kiosk, dims the     │   page loads from 127.0.0.1
+│  screen, runs the webcam sensor if it can         │   (kiosk-full: privileged, with seatd)
+│  cage + Chromium ──► /dev/dri, the laptop display │
 └────────────────────────────────────────────────────┘
  container "airplay" (shairport-sync) ──► metadata pipe + the sound card
  container "services" (Docker collector) ──► services.json
@@ -27,8 +27,11 @@
 The part that talks to the network and keeps your tokens has no business
 touching hardware, and the part that touches hardware has no business holding
 tokens. So the server runs as an unprivileged user without devices, and the
-kiosk agent runs privileged but only ever loads `127.0.0.1` and reads a small
-JSON file. They never call each other: they only exchange small files.
+kiosk agent only ever loads `127.0.0.1` and reads a small JSON file. They never
+call each other: they only exchange small files. The kiosk container gets only
+the graphics card and the input devices; since it cannot write to `/sys`, it
+reports a "software" brightness that the kiosk page applies to itself (with the
+real backlight mounted, or in `kiosk-full`, it sets the hardware backlight).
 
 | File | Written by | Read by | Holds |
 | --- | --- | --- | --- |
