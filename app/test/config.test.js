@@ -92,6 +92,17 @@ test('describe() never returns a secret and marks what the environment fixes', (
   });
 });
 
+test('addresses are as private as keys: the settings page never reads them back', () => {
+  withDataDir({ 'config.json': JSON.stringify({ REFRAME_HOME_ADDRESS: 'Example Street 1', REFRAME_WORK_ADDRESS: 'Office Road 2', REFRAME_PLACE: 'Berlin' }) }, (dir) => {
+    const config = loadConfig({ argv: [], env: { REFRAME_DATA_DIR: dir }, log: quiet });
+    const described = JSON.stringify(config.describe());
+    assert.ok(!described.includes('Example Street') && !described.includes('Office Road'));
+    const fields = Object.fromEntries(config.describe().map((field) => [field.key, field]));
+    assert.equal(fields.REFRAME_HOME_ADDRESS.set, true, 'it says that one is saved');
+    assert.equal(fields.REFRAME_PLACE.value, 'Berlin', 'a place name is not private');
+  });
+});
+
 test('validateSettings rejects unknown keys and bad values, nothing is half-saved', () => {
   assert.throws(() => validateSettings({ REFRAME_NOPE: 'x' }), /Unknown setting/);
   assert.throws(() => validateSettings([]), /JSON object/);

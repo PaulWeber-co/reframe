@@ -4,7 +4,8 @@
 // shape of a value.
 //
 //   text     any text up to 2000 characters
-//   secret   like text, but never sent back to the browser
+//   secret   like text, but never sent back to the browser. Also used for
+//            what is private rather than secret, such as the home address
 //   url      http:// or https://
 //   select   one of options
 //   number   a number within min and max
@@ -23,8 +24,8 @@ export const SETTINGS = [
   { key: 'REFRAME_CALENDAR_ICS', group: 'calendar', type: 'secret' },
 
   { key: 'REFRAME_TOMTOM_KEY', group: 'commute', type: 'secret' },
-  { key: 'REFRAME_HOME_ADDRESS', group: 'commute', type: 'text' },
-  { key: 'REFRAME_WORK_ADDRESS', group: 'commute', type: 'text' },
+  { key: 'REFRAME_HOME_ADDRESS', group: 'commute', type: 'secret' },
+  { key: 'REFRAME_WORK_ADDRESS', group: 'commute', type: 'secret' },
   { key: 'REFRAME_COMMUTE_LABEL', group: 'commute', type: 'text' },
   { key: 'REFRAME_COMMUTE_DAYS', group: 'commute', type: 'text' },
   { key: 'REFRAME_COMMUTE_FROM', group: 'commute', type: 'text' },
