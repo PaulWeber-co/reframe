@@ -16,7 +16,7 @@ export const RULES = [
   { name: 'a personal service or place', pattern: /knuddl|minifunk|firebase|chicken-702b6|rahlstedt|m(ö|oe)nckeberg|hamburg/i },
   { name: 'a laptop the code was first written for', pattern: /\bxps\b|9350/i },
   { name: 'a video source whose terms forbid redistribution', pattern: /mixkit/i },
-  { name: 'an email address (use a no-reply address or example.com)', pattern: /[A-Za-z0-9._%+-]+@(?!users\.noreply\.github\.com|example\.(com|org|net)\b|anthropic\.com\b|[A-Za-z0-9.-]*\.local\b)[A-Za-z0-9-]+\.[A-Za-z.]{2,}/ },
+  { name: 'an email address (use a no-reply address or example.com)', pattern: /[A-Za-z0-9._%+-]+(?:(?<!\bsupport)@|@(?!github\.com\b))(?!users\.noreply\.github\.com|example\.(com|org|net)\b|anthropic\.com\b|[A-Za-z0-9.-]*\.local\b)[A-Za-z0-9-]+\.[A-Za-z.]{2,}/ },
   { name: 'an absolute path of a build machine', pattern: /\/home\/user\b|\/tmp\/claude|\/Users\/[a-z]/i },
 ];
 

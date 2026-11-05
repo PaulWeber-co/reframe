@@ -8,3 +8,7 @@ updates:
     directory: /docker
     schedule:
       interval: weekly
+    ignore:
+      # Stay on the long-term-support Node line; move up by hand.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
