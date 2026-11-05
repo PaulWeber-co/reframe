@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  dashboard:
+    name: Dashboard (Node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests
+        run: npm test
+        working-directory: app
+      - name: Syntax
+        run: npm run check
+        working-directory: app
+      - name: Smoke test
+        run: npm run smoke
+        working-directory: app
+
+  host:
+    name: Host helpers (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python3 -I -m unittest discover -s host/tests -v
+
+  compose:
+    name: Compose files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every profile on its own and all together
+        run: |
+          docker compose config -q
+          for profile in kiosk airplay services; do docker compose --profile "$profile" config -q; done
+          docker compose --profile kiosk --profile airplay --profile services config -q
+      - name: Umbrel app files
+        run: |
+          # umbrelOS supplies the image of app_proxy itself; give it one so the rest can be checked
+          printf 'services:\n  app_proxy:\n    image: busybox\n' > /tmp/proxy.yml
+          for app in reframe-dashboard reframe-display; do
+            docker compose -f "$app/docker-compose.yml" -f /tmp/proxy.yml config -q
+            grep -q "^id: $app$" "$app/umbrel-app.yml"
+          done
+          grep -q "^id: reframe$" umbrel-app-store.yml
+        env:
+          APP_DATA_DIR: /tmp/app
+          DEVICE_DOMAIN_NAME: umbrel.local
+
+  gate:
+    name: Release gate (nothing private in the repository)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/release-gate.mjs
+      - run: node scripts/release-gate.mjs --history
