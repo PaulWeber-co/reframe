@@ -29,6 +29,7 @@ import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, join, normalize, sep } from 'node:path';
 import { createAccess, isSameOrigin } from './access.js';
+import { VERSION } from './config.js';
 import { listBackgrounds } from './backgrounds.js';
 import { validateLayout } from './layout.js';
 
@@ -130,6 +131,7 @@ export function createApp({ hub, store, config, webDir, defaultLayout, control =
 
     if (path === '/api/state' && req.method === 'GET') {
       return sendJson(res, 200, {
+        version: VERSION,
         lang: config.lang,
         place: config.place,
         timezone: config.timezone,

@@ -52,6 +52,7 @@ after(() => {
 test('state lists widgets and the default layout', async () => {
   const state = await (await fetch(`${base}/api/state`)).json();
   assert.equal(state.lang, 'en');
+  assert.match(state.version, /^\d+\.\d+\.\d+$/, 'the version of app/package.json');
   assert.equal(state.place, 'Berlin');
   assert.deepEqual(state.widgets.probe.data, { n: 1 });
   assert.deepEqual(state.layout, DEFAULT_LAYOUT);

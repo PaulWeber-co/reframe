@@ -13,6 +13,14 @@ import { fileURLToPath } from 'node:url';
 import { SETTINGS, validateSettings } from './settings.js';
 
 export const APP_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');
+// The version in app/package.json, shown on the setup page
+export const VERSION = (() => {
+  try {
+    return JSON.parse(readFileSync(join(APP_DIR, 'package.json'), 'utf8')).version ?? '';
+  } catch {
+    return '';
+  }
+})();
 const CONFIG_FILE = 'config.json';
 
 function readSaved(dataDir, log) {

@@ -6,10 +6,12 @@ import { loadLanguage, t } from './i18n.js';
 import { esc } from './util.js';
 
 const GROUPS = ['general', 'calendar', 'commute', 'homeassistant', 'photos', 'services', 'access'];
+const REPO = 'https://github.com/PaulWeber-co/reframe';
 const root = document.getElementById('setup');
 let fields = [];
 let lang = 'en';
 let demo = false;
+let version = '';
 let status = '';
 
 const label = (key) => t(`settings.${key}`);
@@ -59,6 +61,17 @@ function search() {
     </div>`;
 }
 
+function about() {
+  const link = (path, key) => `<a href="${REPO}${path}" target="_blank" rel="noopener">${esc(t(key))}</a>`;
+  return `
+    <section class="su-card su-about">
+      <h2>${esc(t('setup.about.title'))}</h2>
+      <p>${esc(t('setup.about.text'))}</p>
+      <p class="su-facts">${esc(t('setup.about.version', { version: version || '?' }))} · ${esc(t('setup.about.license'))}</p>
+      <p class="su-links">${link('', 'setup.about.source')} · ${link('/issues', 'setup.about.issues')} · ${link('/blob/main/ATTRIBUTION.md', 'setup.about.attribution')}</p>
+    </section>`;
+}
+
 function render() {
   const cards = GROUPS.map((group) => {
     const inGroup = fields.filter((field) => field.group === group);
@@ -73,6 +86,7 @@ function render() {
     <form id="su-form" novalidate>${cards}
       <div class="su-bar"><button type="submit" class="su-button su-primary">${esc(t('setup.save'))}</button><span class="su-status" role="status">${esc(status)}</span></div>
     </form
+    ${about()}
     <p class="su-credits">${esc(t('setup.credits'))}</p>`;
 }
 
@@ -149,6 +163,7 @@ async function boot() {
   const state = await (await fetch('/api/state')).json();
   lang = state.lang;
   demo = state.demo;
+  version = state.version ?? '';
   await loadLanguage(lang);
   document.documentElement.lang = lang;
   document.title = `Reframe · ${t('setup.title')}`;

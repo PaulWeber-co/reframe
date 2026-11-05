@@ -32,3 +32,6 @@ body { margin: 0; min-height: 100vh; color: #fff; font-family: 'Onest', system-u
 .su-status { opacity: .8; }
 .su-note { padding: 2rem 0; opacity: .8; }
 .su-credits { margin-top: 1.5rem; font-size: .82rem; opacity: .55; }
+.su-about p { margin: 0 0 .5rem; }
+.su-facts { opacity: .7; font-size: .9rem; }
+.su-links { font-size: .95rem; }
