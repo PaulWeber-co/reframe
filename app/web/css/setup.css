@@ -1,0 +1,34 @@
+/* The settings page (/setup, web/js/setup.js): one column, readable on a phone. */
+:root { color-scheme: dark; --su-line: rgba(255, 255, 255, .14); --su-on: #63d6a7; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; color: #fff; font-family: 'Onest', system-ui, sans-serif; line-height: 1.4; background: linear-gradient(165deg, #1b2a3a, #0b1118 70%); -webkit-font-smoothing: antialiased; }
+.su { max-width: 44rem; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
+.su-head { display: flex; flex-wrap: wrap; gap: .8rem 2rem; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.su-head h1 { margin: 0 0 .25rem; font-size: 1.8rem; font-weight: 500; letter-spacing: -.02em; }
+.su-head p { margin: 0; opacity: .72; max-width: 32rem; }
+.su-head nav { display: flex; gap: 1rem; font-size: .95rem; }
+.su a { color: #bfe3ff; }
+.su-banner { padding: .7rem 1rem; border-radius: .8rem; background: rgba(255, 195, 107, .2); border: 1px solid rgba(255, 195, 107, .4); }
+.su-card { margin: 0 0 1rem; padding: 1rem 1.1rem 1.1rem; border-radius: 1.1rem; background: rgba(255, 255, 255, .06); border: 1px solid var(--su-line); }
+.su-card h2 { margin: 0 0 .7rem; font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.su-row { display: grid; grid-template-columns: 1fr; gap: .25rem; margin: 0 0 .9rem; }
+.su-row label, .su-search label { font-weight: 500; }
+.su input, .su select { width: 100%; padding: .6rem .75rem; border-radius: .7rem; border: 1px solid var(--su-line); background: rgba(255, 255, 255, .08); color: inherit; font: inherit; }
+.su input:disabled, .su select:disabled { opacity: .55; }
+.su input:focus-visible, .su select:focus-visible, .su button:focus-visible, .su a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.su-hint { opacity: .62; font-size: .85rem; }
+.su-after { display: flex; gap: .8rem; align-items: center; min-height: 0; }
+.su-set { color: var(--su-on); font-size: .85rem; }
+.su-search { margin: 0 0 1.1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--su-line); }
+.su-search-row { display: flex; gap: .5rem; margin-top: .3rem; }
+.su-results { list-style: none; margin: .5rem 0 0; padding: 0; }
+.su-results li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .45rem 0; border-top: 1px solid var(--su-line); }
+.su-results small, .su-none { opacity: .65; }
+.su-button { all: unset; flex: none; padding: .6rem 1rem; border-radius: .7rem; background: rgba(255, 255, 255, .14); cursor: pointer; text-align: center; }
+.su-primary { background: #fff; color: #0b1118; font-weight: 500; }
+.su-link { all: unset; color: #bfe3ff; cursor: pointer; text-decoration: underline; font-size: .9rem; }
+.su-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.su-bar { position: sticky; bottom: 0; display: flex; align-items: center; gap: 1rem; padding: .8rem 0; background: linear-gradient(0deg, #0b1118 60%, transparent); }
+.su-status { opacity: .8; }
+.su-note { padding: 2rem 0; opacity: .8; }
+.su-credits { margin-top: 1.5rem; font-size: .82rem; opacity: .55; }
