@@ -1,0 +1,103 @@
+{
+ "_note": "Synthetic fixture in the shape of Wikimedia's featured feed. The people, places and events are made up for testing.",
+ "tfa": {
+  "title": "Example_Lighthouse",
+  "titles": {
+   "normalized": "Example Lighthouse"
+  },
+  "extract": "Example Lighthouse is a made-up lighthouse used to test the article of the day. It stands on an imaginary headland, was lit for the first time in a year that never happened, and keeps its keeper busy with nothing at all. Example Lighthouse is a made-up lighthouse used to test the article of the day. It stands on an imaginary headland, was lit for the first time in a year that never happened, and keeps its keeper busy with nothing at all. ",
+  "thumbnail": {
+   "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Example.jpg/330px-Example.jpg",
+   "width": 330,
+   "height": 220
+  }
+ },
+ "dyk": [
+  {
+   "text": "... that the Example Lighthouse (pictured) has never guided a real ship?"
+  },
+  {
+   "text": "... that the fictional town of Testville elects its mayor by coin toss?"
+  },
+  {
+   "text": "... that a sample feed needs at least a few sample facts?"
+  },
+  {
+   "text": "... that the placeholder bridge is exactly 12 metres long?"
+  },
+  {
+   "text": "... that no one has seen the Demo Orchestra play twice in a row?"
+  },
+  {
+   "text": "... that the mock railway runs on Tuesdays only?"
+  },
+  {
+   "text": "... that the dummy river flows uphill for 3 kilometres?"
+  },
+  {
+   "text": "... that the sample village has more fountains than houses?"
+  }
+ ],
+ "onthisday": [
+  {
+   "text": "The fictional Treaty of Testville is signed (pictured).",
+   "year": 1996,
+   "pages": [
+    {
+     "titles": {
+      "normalized": "Treaty of Testville"
+     },
+     "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Example.jpg/330px-Example.jpg",
+      "width": 330,
+      "height": 220
+     }
+    }
+   ]
+  },
+  {
+   "text": "The imaginary Demo Observatory records its first sample comet.",
+   "year": 1991,
+   "pages": [
+    {
+     "titles": {
+      "normalized": "Demo Observatory"
+     }
+    }
+   ]
+  },
+  {
+   "text": "A made-up railway between Example City and Mock Valley opens.",
+   "year": 1876,
+   "pages": [
+    {
+     "titles": {
+      "normalized": "Mock Valley Railway"
+     }
+    }
+   ]
+  },
+  {
+   "text": "The Placeholder Bridge is finished after exactly twelve metres of work.",
+   "year": 1826,
+   "pages": [
+    {
+     "titles": {
+      "normalized": "Placeholder Bridge"
+     }
+    }
+   ]
+  },
+  {
+   "text": "The Sample Academy admits its first imaginary students.",
+   "year": 1726,
+   "pages": [
+    {
+     "titles": {
+      "normalized": "Sample Academy"
+     }
+    }
+   ]
+  }
+ ]
+}
