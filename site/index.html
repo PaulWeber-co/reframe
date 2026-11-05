@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reframe — a second life for an old laptop's screen</title>
+<meta name="description" content="Give an old laptop's screen a second life as a wall dashboard: clock, weather, calendar, to-dos and AirPlay cover art. Docker and umbrelOS app.">
+<meta property="og:title" content="Reframe">
+<meta property="og:description" content="Give an old laptop's screen a second life as a wall dashboard.">
+<meta property="og:image" content="https://paulweber-co.github.io/reframe/img/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg: #fafafa;
+  --fg: #111214;
+  --muted: #6b6f76;
+  --line: #e6e7ea;
+  --card: #fff;
+  --accent: #111214;
+  --on-accent: #fff;
+  --code: #f0f1f3;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0d0f;
+    --fg: #f2f3f5;
+    --muted: #92979f;
+    --line: #23262b;
+    --card: #131518;
+    --accent: #f2f3f5;
+    --on-accent: #0c0d0f;
+    --code: #1a1d21;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+img { display: block; max-width: 100%; height: auto; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* top bar */
+header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
+.brand img { width: 26px; height: 26px; border-radius: 7px; }
+nav { display: flex; align-items: center; gap: 26px; font-size: 15px; }
+nav a { text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--fg); }
+nav a.btn { color: var(--on-accent); }
+
+.btn { display: inline-block; padding: 10px 20px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 500; font-size: 15px; text-decoration: none; border: 1px solid var(--accent); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--muted); }
+header .btn { padding: 7px 16px; font-size: 14px; }
+
+/* hero */
+.hero { padding: 88px 0 56px; text-align: center; }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; color: var(--muted); }
+h1 { font-size: clamp(40px, 7vw, 76px); line-height: 1.04; letter-spacing: -.035em; font-weight: 650; margin: 22px 0 18px; }
+.lead { max-width: 560px; margin: 0 auto 32px; color: var(--muted); font-size: 19px; }
+.actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* screenshot in a frame */
+.frame { margin: 56px auto 0; border-radius: 14px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 30px 80px -30px rgba(0,0,0,.35); overflow: hidden; }
+.frame .bar { height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 14px; border-bottom: 1px solid var(--line); }
+.frame .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.frame img { width: 100%; }
+.caption { font-size: 13px; color: var(--muted); margin: 14px 0 0; text-align: center; }
+
+/* sections */
+section { padding: 88px 0 0; }
+h2 { font-size: clamp(30px, 4.4vw, 44px); line-height: 1.08; letter-spacing: -.03em; font-weight: 650; margin: 0 0 14px; }
+.sub { color: var(--muted); margin: 0 0 40px; max-width: 540px; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-top: 1px solid var(--line); }
+.grid > div { padding: 28px 32px 28px 0; border-bottom: 1px solid var(--line); }
+.grid > div:nth-child(even) { padding: 28px 0 28px 32px; border-left: 1px solid var(--line); }
+h3 { font-size: 19px; letter-spacing: -.015em; font-weight: 600; margin: 0 0 6px; }
+.grid p { margin: 0; color: var(--muted); font-size: 16px; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.shot { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+.music { display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; align-items: stretch; }
+.music .phone { display: flex; justify-content: center; align-items: center; background: var(--card); }
+.music .phone img { max-height: 380px; width: auto; border-radius: 0; }
+
+/* tiles */
+.tiles { columns: 2; column-gap: 32px; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.tiles li { break-inside: avoid; padding: 13px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; font-size: 16px; }
+.tiles span { color: var(--muted); text-align: right; }
+
+/* run it */
+.run { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; min-width: 0; }
+.card p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+pre { margin: 0; padding: 12px 14px; background: var(--code); border-radius: 8px; white-space: pre-wrap; word-break: break-all; font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.more { margin-top: 28px; font-size: 15px; color: var(--muted); }
+
+/* footer */
+footer { margin-top: 112px; border-top: 1px solid var(--line); padding: 32px 0 48px; font-size: 14px; color: var(--muted); }
+footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+footer .links { display: flex; gap: 22px; flex-wrap: wrap; }
+footer a { text-decoration: none; }
+footer a:hover { color: var(--fg); }
+
+@media (max-width: 760px) {
+  nav a:not(.btn) { display: none; }
+  .hero { padding-top: 56px; }
+  .grid, .music, .run, .pair { grid-template-columns: 1fr; }
+  .grid > div, .grid > div:nth-child(even) { padding: 24px 0; border-left: 0; }
+  .tiles { columns: 1; }
+  .music .phone img { max-height: 320px; }
+  section { padding-top: 64px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#"><img src="icon.svg" alt="">Reframe</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#tiles">Tiles</a>
+      <a href="#install">Install</a>
+      <a class="btn" href="https://github.com/PaulWeber-co/reframe">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <span class="badge">Open source · MIT</span>
+    <h1>An old laptop.<br>A new wall.</h1>
+    <p class="lead">Reframe turns the screen of a laptop from the drawer into a calm wall dashboard. It runs in Docker and as an umbrelOS app.</p>
+    <div class="actions">
+      <a class="btn" href="#install">Get started</a>
+      <a class="btn ghost" href="https://github.com/PaulWeber-co/reframe">View on GitHub</a>
+    </div>
+    <div class="frame">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <img src="img/dashboard-day.jpg" width="1800" height="1013" alt="The Reframe dashboard on a day scene">
+    </div>
+    <p class="caption">Sample data. Background: NASA astronaut photograph, public domain.</p>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>Everything on one screen.</h2>
+      <p class="sub">Open the page, tell it where you live, connect a calendar. That is the whole setup.</p>
+      <div class="grid">
+        <div>
+          <h3>A calm wall display</h3>
+          <p>The scene follows the sun: morning, day, evening and late each have their own light. At night it dims to a clock, or goes off, on a schedule.</p>
+        </div>
+        <div>
+          <h3>Looks after itself</h3>
+          <p>Brightness follows the room, the screen sleeps on a schedule, a tap wakes it, and it starts again after a power cut.</p>
+        </div>
+        <div>
+          <h3>Your own video</h3>
+          <p>Put your clips in a folder and they play behind the tiles by time of day. Without clips you get slowly drifting colour.</p>
+        </div>
+        <div>
+          <h3>Set up in the browser</h3>
+          <p>No config files. English and German built in. Your phone is the remote control.</p>
+        </div>
+      </div>
+
+      <div class="music" style="margin-top:56px">
+        <div class="shot"><img src="img/dashboard-music.jpg" width="1400" height="788" alt="Music mode with cover art" loading="lazy"></div>
+        <div class="shot phone"><img src="img/control-phone.jpg" width="520" height="1125" alt="The control center on a phone" loading="lazy"></div>
+      </div>
+      <p class="caption">Play something to the AirPlay speaker “Reframe” and the wall shows the cover and progress. The control center runs on any phone.</p>
+
+      <div class="pair">
+        <div class="shot"><img src="img/dashboard-evening.jpg" width="1000" height="563" alt="Evening scene" loading="lazy"></div>
+        <div class="shot"><img src="img/dashboard-late.jpg" width="1000" height="563" alt="Late scene" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tiles">
+    <div class="wrap">
+      <h2>The tiles.</h2>
+      <p class="sub">Drag them around, hide what you do not need. Writing your own takes two files.</p>
+      <ul class="tiles">
+        <li>Weather <span>no account needed</span></li>
+        <li>Calendar <span>any iCal link</span></li>
+        <li>To-dos <span>tick off on the wall or phone</span></li>
+        <li>System <span>CPU, memory, disk, temperature</span></li>
+        <li>Services <span>your containers, problems first</span></li>
+        <li>Commute <span>drive time with traffic</span></li>
+        <li>Wikipedia <span>on this day, article of the day</span></li>
+        <li>Home <span>Home Assistant entities</span></li>
+        <li>Photos <span>Immich library numbers</span></li>
+        <li>Music <span>AirPlay cover and progress</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2>Three ways to run it.</h2>
+      <p class="sub">Docker is all you need. The kiosk on the laptop's own display is Linux only.</p>
+      <div class="run">
+        <div class="card">
+          <h3>In a browser</h3>
+          <p>Any machine with Docker. Open the page on a tablet, a TV or a phone.</p>
+<pre>git clone https://github.com/PaulWeber-co/reframe
+cd reframe
+docker compose up -d</pre>
+        </div>
+        <div class="card">
+          <h3>On the laptop's screen</h3>
+          <p>A Linux laptop without a desktop session. No privileged container.</p>
+<pre>docker compose \
+  --profile kiosk up -d</pre>
+        </div>
+        <div class="card">
+          <h3>On umbrelOS</h3>
+          <p>Add the community store, then install Reframe or Reframe Display.</p>
+<pre>https://github.com/
+PaulWeber-co/reframe</pre>
+        </div>
+      </div>
+      <p class="more">Details, hardware notes and what has been tested: <a href="https://github.com/PaulWeber-co/reframe#readme">README</a> · <a href="https://github.com/PaulWeber-co/reframe/blob/main/docs/hardware.md">Hardware</a> · <a href="https://github.com/PaulWeber-co/reframe/blob/main/docs/umbrel.md">umbrelOS</a></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Reframe · MIT License · Not affiliated with Umbrel.</span>
+    <div class="links">
+      <a href="https://github.com/PaulWeber-co/reframe">GitHub</a>
+      <a href="https://github.com/PaulWeber-co/reframe/blob/main/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/PaulWeber-co/reframe/blob/main/ATTRIBUTION.md">Credits</a>
+      <a href="https://github.com/PaulWeber-co/reframe/issues">Issues</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
