@@ -16,12 +16,15 @@ description: >-
   dark becomes the nicest part of your home server.
 
 
-  Please read the notes first: driving a screen from a container needs a
-  privileged container, and it depends on your hardware. The project README has
-  a short checklist, and the plain dashboard ("Reframe") works everywhere.
+  It runs without a privileged container: the graphics card comes from Umbrel's
+  GPU permission and the input devices are mapped in. Whether a machine lets a
+  container take over its screen depends on the hardware, so the project README
+  has a short checklist, and the plain dashboard ("Reframe") works everywhere.
 developer: Paul Weber
 website: https://github.com/PaulWeber-co/reframe
 dependencies: []
+permissions:
+  - GPU
 repo: https://github.com/PaulWeber-co/reframe
 support: https://github.com/PaulWeber-co/reframe/issues
 port: 7777

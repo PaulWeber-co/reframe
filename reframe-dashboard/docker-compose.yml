@@ -11,9 +11,9 @@ services:
     restart: on-failure
     volumes:
       # The entrypoint takes care of the folder's owner, so a fresh install just works
-      - ${APP_DATA_DIR}/data:/data
+      - ${APP_DATA_DIR}/data/config:/data
       # Your own background clips: see "Your own video" in the README
-      - ${APP_DATA_DIR}/media:/media
+      - ${APP_DATA_DIR}/data/media:/media
     environment:
       REFRAME_ALLOWED_HOSTS: ${DEVICE_DOMAIN_NAME}
     security_opt:

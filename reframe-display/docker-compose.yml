@@ -10,34 +10,42 @@ services:
     image: ghcr.io/paulweber-co/reframe:0.1.0
     restart: on-failure
     volumes:
-      - ${APP_DATA_DIR}/data:/data
-      - ${APP_DATA_DIR}/media:/media
-      - ${APP_DATA_DIR}/run:/run/reframe
-      - ${APP_DATA_DIR}/airplay:/run/shairport-sync:ro
+      # The entrypoint takes care of the folders' owner, so a fresh install just works
+      - ${APP_DATA_DIR}/data/config:/data
+      - ${APP_DATA_DIR}/data/media:/media
+      - ${APP_DATA_DIR}/data/run:/run/reframe
+      - ${APP_DATA_DIR}/data/airplay:/run/shairport-sync:ro
     environment:
       REFRAME_ALLOWED_HOSTS: ${DEVICE_DOMAIN_NAME}
     security_opt:
       - no-new-privileges:true
 
-  # Chromium full screen on this machine's display, brightness, webcam sensor.
-  # Shares the dashboard's network so the page loads from 127.0.0.1. It needs
-  # the machine's display and input devices, hence privileged.
+  # Chromium full screen on this machine's display. No privileged mode and no
+  # extra capabilities: the graphics card (/dev/dri) comes from the GPU
+  # permission in umbrel-app.yml, the input devices are mapped here, and the udev
+  # database is read-only. cage runs without a seat daemon (the "noop" seat).
+  # It shares the dashboard's network, so the page loads from 127.0.0.1.
+  # Brightness is dimmed in the page.
   kiosk:
     image: ghcr.io/paulweber-co/reframe:0.1.0
     command: kiosk
     restart: on-failure
     network_mode: "service:web"
-    privileged: true
-    tty: true
     depends_on:
       - web
+    environment:
+      REFRAME_KIOSK_SEAT: noop
+    devices:
+      - /dev/input:/dev/input
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - ${APP_DATA_DIR}/data:/data
-      - ${APP_DATA_DIR}/run:/run/reframe
-      - /dev:/dev
+      - ${APP_DATA_DIR}/data/config:/data
+      - ${APP_DATA_DIR}/data/run:/run/reframe
+      - /run/udev:/run/udev:ro
 
-  # AirPlay 2 speaker. Needs the host network for discovery and uses the
-  # machine's avahi-daemon, which umbrelOS runs.
+  # AirPlay 2 speaker. Needs the host network for discovery (multicast) and
+  # uses the machine's avahi-daemon, which umbrelOS runs.
   airplay:
     image: mikebrady/shairport-sync:5.5.2
     restart: on-failure
@@ -49,7 +57,7 @@ services:
     environment:
       ENABLE_AVAHI: "0"
     volumes:
-      - ${APP_DATA_DIR}/airplay:/run/shairport-sync
+      - ${APP_DATA_DIR}/data/airplay:/run/shairport-sync
       - ${APP_DATA_DIR}/shairport-sync.conf:/etc/shairport-sync.conf:ro
       - /var/run/dbus:/var/run/dbus
       - /var/run/avahi-daemon:/var/run/avahi-daemon

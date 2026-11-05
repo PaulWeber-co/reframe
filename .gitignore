@@ -1,5 +1,8 @@
 node_modules/
 data/
+# ... except the folders an Umbrel app ships empty (kept with .gitkeep)
+!reframe-dashboard/data/
+!reframe-display/data/
 .env
 .env.*
 !.env.example
