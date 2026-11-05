@@ -25,4 +25,16 @@ for app in reframe-dashboard reframe-display; do
 	sed -i -E "s#image: $image:[^ @]+(@sha256:[0-9a-f]+)?#image: $image:$version@$digest#" "$root/$app/docker-compose.yml"
 	sed -i -E "s#^version: .*#version: \"$version\"#" "$root/$app/umbrel-app.yml"
 done
+# The AirPlay image of the display app, too: Umbrel wants every image pinned
+shairport="mikebrady/shairport-sync"
+tag="$(sed -n "s#.*image: $shairport:\([0-9][0-9.]*\).*#\1#p" "$root/reframe-display/docker-compose.yml" | head -n 1)"
+if [ -n "$tag" ]; then
+	other="$(docker buildx imagetools inspect "$shairport:$tag" --format '{{json .Manifest.Digest}}' | tr -d '"')"
+	case "$other" in
+		sha256:????????????????????????????????????????????????????????????????)
+			sed -i -E "s#image: $shairport:[0-9][0-9.]*(@sha256:[0-9a-f]+)?#image: $shairport:$tag@$other#" "$root/reframe-display/docker-compose.yml"
+			echo "pinned $shairport:$tag@$other" ;;
+		*) echo "could not read a digest for $shairport:$tag, left unpinned" >&2 ;;
+	esac
+fi
 echo "pinned $image:$version@$digest"
