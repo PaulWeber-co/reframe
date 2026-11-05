@@ -1,0 +1,16 @@
+{
+  "name": "reframe",
+  "private": true,
+  "description": "Reframe: a wall dashboard for the screen of an old laptop",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "demo": "node server/index.js --demo",
+    "test": "node --test --test-timeout=20000",
+    "check": "node scripts/check.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  }
+}

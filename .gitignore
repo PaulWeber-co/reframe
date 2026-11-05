@@ -1,0 +1,13 @@
+node_modules/
+data/
+.env
+.env.*
+!.env.example
+
+# Your own clips and their still pictures stay on your machine
+media/*
+!media/README.md
+
+__pycache__/
+*.pyc
+.DS_Store
