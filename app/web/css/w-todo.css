@@ -1,0 +1,36 @@
+/* To-do tile (web/js/widgets/todo.js). Six colours for the dot, one per name:
+   the same name always gets the same one (server/widgets/todo.js, colorOf). */
+.t[data-id="todo"] {
+  --td-c0: #8f86ff; --td-c1: #ff8fb4; --td-c2: #7fe0b0; --td-c3: #ffd27a; --td-c4: #7fd0ff; --td-c5: #ffa27f;
+}
+.t[data-id="todo"] .lbl .ic { color: var(--td-c1); }
+/* The body is the container: the tile's own width decides how much a row shows */
+.t[data-id="todo"] .body { container-type: inline-size; }
+
+.td { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.td-list { list-style: none; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Three fit a 1×1 tile; a wide tile shows up to five */
+.td-row:nth-child(n + 4) { display: none; }
+@container (min-width: 380px) { .td-row:nth-child(n + 4) { display: flex; } }
+.td-row { display: flex; align-items: flex-start; gap: 11px; padding: 6px 0; font-size: 19px; line-height: 1.2; cursor: pointer; }
+.td-row:focus-visible { outline: 2px solid rgba(255, 255, 255, .6); outline-offset: 2px; border-radius: 8px; }
+.td-dot { flex: none; width: 21px; height: 21px; margin-top: 1px; border-radius: 11px; border: 2.5px solid rgba(255, 255, 255, .85); box-sizing: border-box; }
+.td-dot.td-c0 { border-color: var(--td-c0); }
+.td-dot.td-c1 { border-color: var(--td-c1); }
+.td-dot.td-c2 { border-color: var(--td-c2); }
+.td-dot.td-c3 { border-color: var(--td-c3); }
+.td-dot.td-c4 { border-color: var(--td-c4); }
+.td-dot.td-c5 { border-color: var(--td-c5); }
+.td-text { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* Only in a wide tile, where it fits: when it is due */
+.td-when { display: none; margin-left: 8px; font-size: 14px; font-weight: 600; }
+@container (min-width: 380px) { .td-when { display: inline; } }
+.td-when.td-overdue { color: #ffb199; }
+.td-when.td-today { color: #ffd27a; }
+.td-when.td-tomorrow, .td-when.td-later { color: rgba(255, 255, 255, .7); }
+
+.td-more { margin-top: auto; padding-top: 4px; font-size: 14px; opacity: .65; }
+.td-empty { justify-content: center; }
+.td-allDone { font-size: 26px; font-weight: 600; line-height: 1.15; }
+.td-empty .sub { margin-top: 6px; }
