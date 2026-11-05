@@ -2,6 +2,9 @@
 
 **Give an old laptop's screen a second life as a wall dashboard.**
 
+[![CI](https://github.com/PaulWeber-co/reframe/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulWeber-co/reframe/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Most of us have an old laptop in a drawer. The screen is fine, the battery is
 tired, and it is too slow for today's browser tabs. Reframe turns it into the
 nicest corner of your home: a glassy dashboard with the clock, the weather,
@@ -135,7 +138,7 @@ center. Writing your own tile takes two files: [docs/widgets.md](docs/widgets.md
 | | |
 | --- | --- |
 | Dashboard, setup, control center, to-dos, widgets | tested: about 200 unit tests, host-helper tests and a smoke test, all in CI |
-| Container files, compose profiles, Umbrel app files | validated (`docker compose config`), image build in CI |
+| The container image | built and started in CI for amd64 (the arm64 image is built and pushed, not run); compose profiles and Umbrel app files validated |
 | The kiosk chain (cage without a seat daemon, Chromium, the scripts) | verified without a screen, in CI (`scripts/kiosk-headless-check.sh`) |
 | Taking over a real display, touch, brightness, webcam | built from established patterns, **not yet verified on hardware** |
 | AirPlay from a phone | the same setup that ran on a real machine, **not yet verified in this form** |
@@ -146,9 +149,9 @@ If you try the kiosk or the Umbrel app, a short report helps everyone:
 
 ## More
 
-- [Installation](docs/installation.md) · [Configuration](docs/configuration.md) · [Hardware](docs/hardware.md)
+- [Installation](docs/installation.md) · [Configuration](docs/configuration.md) · [Hardware](docs/hardware.md) · [Troubleshooting](docs/troubleshooting.md)
 - [umbrelOS](docs/umbrel.md) · [How it fits together](docs/architecture.md) · [Writing a tile](docs/widgets.md)
-- [Security](SECURITY.md) · [Attribution](ATTRIBUTION.md) · [Contributing](CONTRIBUTING.md)
+- [Security](SECURITY.md) · [Attribution](ATTRIBUTION.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [Releasing](RELEASING.md)
 
 Reframe started as the dashboard of one old laptop that became a home server.
 If you want umbrelOS itself in a container, see the
