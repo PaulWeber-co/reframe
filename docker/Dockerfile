@@ -3,7 +3,7 @@
 # Which one runs is the command: server (default), kiosk, services.
 #
 #   docker build -f docker/Dockerfile -t reframe .
-FROM node:22-trixie-slim
+FROM node:25-trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 # chromium, cage and seatd: the kiosk. ffmpeg and v4l-utils: clips, posters and
