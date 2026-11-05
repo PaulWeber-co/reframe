@@ -27,7 +27,8 @@ RUN chmod +x entrypoint.sh host/reframe-kiosk.sh host/reframe-display host/refra
     && ln -s /opt/reframe/host/reframe-display /usr/local/bin/reframe-display \
     && ln -s /opt/reframe/host/reframe_media.py /usr/local/bin/reframe-media \
     && mkdir -p /data /media /run/reframe \
-    && chown -R node:node /data /media /run/reframe
+    && chown -R node:node /data /media \
+    && chown node:node /run/reframe && chmod 1777 /run/reframe
 
 ENV REFRAME_DATA_DIR=/data \
     REFRAME_MEDIA_DIR=/media \

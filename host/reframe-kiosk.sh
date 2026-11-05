@@ -1,13 +1,31 @@
 #!/bin/sh
-# The wall dashboard on the laptop's display: seatd (a seat manager), cage (a
-# Wayland compositor for exactly one program) and Chromium in kiosk mode, as an
-# unprivileged user inside the container. reframe_host.py starts and stops
-# this script when the control center switches the screen on or off.
+# The wall dashboard on the laptop's display: cage (a Wayland compositor for
+# exactly one program) and Chromium in kiosk mode, inside the container.
+# reframe_host.py starts and stops this script when the control center
+# switches the screen on or off.
+#
+# Two ways to get hold of the display (REFRAME_KIOSK_SEAT):
+#
+#   noop    (default) No seat daemon, no virtual console, no extra privileges.
+#           cage opens the graphics card itself, which works when nothing else
+#           on the machine is showing a desktop: the first program to open the
+#           card becomes its master. The container needs only the devices
+#           /dev/dri and /dev/input, and /run/udev read-only for the input
+#           devices. This is what the "kiosk" compose profile does.
+#   seatd   A seat daemon takes the display over properly, including switching
+#           the virtual console. Needs a privileged container. This is the
+#           "kiosk-full" profile, for machines where noop does not work.
+#
+# REFRAME_KIOSK_HEADLESS=1 runs the same chain without any display (cage's
+# headless backend, software rendering): for trying and testing the kiosk on a
+# machine that has no screen, such as a CI runner.
 set -eu
 
 URL="${REFRAME_KIOSK_URL:-http://127.0.0.1:7777/?kiosk=1}"
 PROFILE="${REFRAME_KIOSK_HOME:-/tmp/reframe-kiosk}"
 RUNTIME="${XDG_RUNTIME_DIR:-/tmp/reframe-runtime}"
+SEAT="${REFRAME_KIOSK_SEAT:-noop}"
+CHROMIUM="${REFRAME_CHROMIUM:-chromium}"
 mkdir -p "$PROFILE" "$RUNTIME"
 chmod 700 "$RUNTIME"
 export XDG_RUNTIME_DIR="$RUNTIME"
@@ -46,11 +64,32 @@ fi
 # Chromium decodes the background videos on the GPU where it can (VA-API); no
 # keyring, no update or crash bubbles, no swipe-back on the touchpad, no
 # translation offer. ?kiosk=1 tells the page it is the wall display: only here
-# a dark screen goes black and a tap wakes it.
-export LIBSEAT_BACKEND=seatd
-exec seatd-launch -- cage -s -- chromium --kiosk --no-sandbox --ozone-platform=wayland \
+# a dark screen goes black and a tap wakes it. --no-sandbox because Chromium's
+# sandbox does not work in a container without extra rights; the browser only
+# ever shows the dashboard on 127.0.0.1.
+set -- "$CHROMIUM" --kiosk --no-sandbox --ozone-platform=wayland --disable-dev-shm-usage \
 	--enable-features=AcceleratedVideoDecodeLinuxGL,AcceleratedVideoDecodeLinuxZeroCopyGL,VaapiVideoDecoder \
 	--disable-features=TranslateUI --autoplay-policy=no-user-gesture-required \
 	--no-first-run --no-default-browser-check --disable-infobars --disable-session-crashed-bubble --noerrdialogs \
 	--password-store=basic --overscroll-history-navigation=0 --check-for-update-interval=31536000 \
 	--user-data-dir="$PROFILE/chromium" "$start"
+
+if [ "${REFRAME_KIOSK_HEADLESS:-0}" = "1" ]; then
+	export WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1
+	set -- "$@" --disable-gpu
+fi
+
+case "$SEAT" in
+	seatd)
+		export LIBSEAT_BACKEND=seatd
+		exec seatd-launch -- cage -s -- "$@"
+		;;
+	noop)
+		export LIBSEAT_BACKEND=noop
+		exec cage -s -- "$@"
+		;;
+	*)
+		echo "reframe-kiosk: REFRAME_KIOSK_SEAT must be noop or seatd, not '$SEAT'" >&2
+		exit 2
+		;;
+esac
