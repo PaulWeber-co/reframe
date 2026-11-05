@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""The control center from the command line, e.g. over SSH (see HELP).
+
+It talks to the dashboard on this machine (http://127.0.0.1:7777), which
+needs no PIN, so it works for anyone who can run it:
+
+  docker compose exec reframe reframe-display off 30
+"""
+import json
+import os
+import sys
+import time
+import urllib.error
+import urllib.request
+
+BASE = os.environ.get("REFRAME_URL", "http://127.0.0.1:7777")
+STATES = {"on": "on", "off": "off", "black": "sleep", "sleep": "sleep", "night": "night"}
+MODES = {"auto": "auto", "on": "on", "off": "off"}
+NAMES = {"on": "on", "night": "night clock", "sleep": "black", "off": "off"}
+DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+HELP = """Control the wall display from the command line:
+
+  reframe-display                    what the screen shows right now, and why
+  reframe-display off [minutes]      screen off (kiosk stopped), 60 minutes by default
+  reframe-display black [minutes]    screen black, a tap wakes it
+  reframe-display night [minutes]    only the night clock
+  reframe-display on [minutes]       dashboard on
+  reframe-display tomorrow           off until the schedule starts again
+  reframe-display auto               back to automatic: ends a temporary state
+                                     and the modes on/off
+  reframe-display mode auto|on|off   Automatic, Always on or server only
+
+The same is available in the browser at http://reframe.local:7777/control."""
+
+
+def call(method, path, body=None):
+    data = None if body is None else json.dumps(body).encode()
+    request = urllib.request.Request(BASE + path, data=data, method=method, headers={"content-type": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        sys.exit(f"reframe-display: {json.load(error).get('error', error.reason)}")
+    except OSError as error:
+        sys.exit(f"reframe-display: the dashboard is not reachable ({error})")
+
+
+def clock(ms):
+    """22:30 today, else "Sat 07:00", in this machine's time zone"""
+    if not ms:
+        return ""
+    at = time.localtime(ms / 1000)
+    text = time.strftime("%H:%M", at)
+    return text if at.tm_yday == time.localtime().tm_yday else f"{DAYS[at.tm_wday]} {text}"
+
+
+def show(snapshot):
+    effective = snapshot["effective"]
+    line = f"Screen: {NAMES[effective['display']]} ({effective['reason'].replace('_', ' ')})"
+    if effective.get("until"):
+        line += f" until {clock(effective['until'])}"
+    print(line)
+    if effective.get("next") and effective["source"] in ("schedule", "dark"):
+        print(f"Then:   {NAMES[effective['next']['display']]} from {clock(effective['next']['at'])}")
+    print(f"Mode:   {snapshot['settings']['mode']}")
+    status = snapshot.get("status") or {}
+    if status:
+        print(f"Kiosk:  {status.get('kiosk', '?')}   brightness: {status.get('backlightPercent', '?')} %")
+
+
+def main(args):
+    if not args:
+        return show(call("GET", "/api/control"))
+    word = args[0].lower()
+    if word in ("-h", "--help", "help"):
+        print(HELP)
+        return None
+    if word == "auto":
+        call("POST", "/api/control/override", {"clear": True})
+        return show(call("PUT", "/api/control", {"mode": "auto"}))
+    if word == "tomorrow":
+        return show(call("POST", "/api/control/override", {"state": "off", "until": "morning"}))
+    if word == "mode" and len(args) == 2 and args[1].lower() in MODES:
+        return show(call("PUT", "/api/control", {"mode": MODES[args[1].lower()]}))
+    if word in STATES:
+        minutes = int(args[1]) if len(args) > 1 and args[1].isdigit() else 60
+        return show(call("POST", "/api/control/override", {"state": STATES[word], "minutes": minutes}))
+    sys.exit(HELP)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
