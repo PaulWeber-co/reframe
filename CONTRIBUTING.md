@@ -29,4 +29,5 @@ Text in the dashboard goes into both `app/web/i18n/en.json` and `de.json`; a
 test fails if one has a key the other lacks. Other languages are welcome: add a
 file and a line in `app/server/settings.js`.
 
-Please keep changes small and say in the pull request what you ran.
+Please keep changes small and say in the pull request what you ran. Be kind: this
+is a hobby project, and the people who report, review and fix are volunteers.

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/PaulWeber-co/reframe/discussions
+    about: Not a bug? Ask or suggest here (if Discussions is switched on), or read docs/troubleshooting.md first.
+  - name: Security problem
+    url: https://github.com/PaulWeber-co/reframe/security/advisories/new
+    about: Please report vulnerabilities privately.

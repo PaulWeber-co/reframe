@@ -1,0 +1,43 @@
+name: Bug report
+description: Something does not work as described
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks. Please look at [docs/troubleshooting.md](https://github.com/PaulWeber-co/reframe/blob/main/docs/troubleshooting.md) first. Never paste tokens, calendar links or addresses.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can it be reproduced?
+      placeholder: "1. ...\n2. ..."
+  - type: dropdown
+    id: install
+    attributes:
+      label: How is it installed?
+      options:
+        - docker compose (dashboard only)
+        - docker compose, kiosk profile
+        - docker compose, kiosk-full profile
+        - umbrelOS, Reframe
+        - umbrelOS, Reframe Display
+        - other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown on the settings page under "About".
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: "`docker compose logs reframe` (and `kiosk`), or the browser console. Remove anything private."
+      render: shell

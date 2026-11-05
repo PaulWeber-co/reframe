@@ -1,0 +1,60 @@
+name: Hardware report
+description: You tried the kiosk or the Umbrel Display app on a machine
+title: "Hardware report: "
+labels: [hardware]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These reports are the most useful thing right now: the kiosk depends on the laptop. A short answer to each question is plenty. See [docs/hardware.md](https://github.com/PaulWeber-co/reframe/blob/main/docs/hardware.md).
+  - type: input
+    id: machine
+    attributes:
+      label: Machine
+      description: Make, model, year.
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: Graphics
+      description: "Output of `lspci | grep -i vga`."
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: "For example Debian 13 server, Ubuntu 24.04 server, umbrelOS 2.0."
+    validations:
+      required: true
+  - type: dropdown
+    id: profile
+    attributes:
+      label: What did you run?
+      options:
+        - docker compose, kiosk profile
+        - docker compose, kiosk-full profile
+        - umbrelOS, Reframe Display
+    validations:
+      required: true
+  - type: checkboxes
+    id: worked
+    attributes:
+      label: What worked?
+      options:
+        - label: The dashboard showed on the laptop's own screen
+        - label: Touch or mouse worked
+        - label: Brightness changed (real backlight, or the page dimmed)
+        - label: The screen went black or off by the schedule
+        - label: The webcam sensor measured the room
+        - label: AirPlay played and the wall showed the cover
+  - type: textarea
+    id: notes
+    attributes:
+      label: What did not work, and anything else
+  - type: textarea
+    id: logs
+    attributes:
+      label: "`docker compose logs kiosk`"
+      render: shell
