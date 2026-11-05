@@ -1,9 +1,12 @@
 name: Pages
 
+# Paused: the site is not published automatically. To publish again, run this
+# workflow by hand (Actions -> Pages -> Run workflow), or restore the push
+# trigger below.
 on:
-  push:
-    branches: [main]
-    paths: ["site/**", ".github/workflows/pages.yml"]
+  # push:
+  #   branches: [main]
+  #   paths: ["site/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
