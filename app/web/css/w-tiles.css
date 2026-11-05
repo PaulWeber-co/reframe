@@ -1,0 +1,6 @@
+/* Calendar tile (web/js/widgets/calendar.js). */
+.calendar-list { min-height: 0; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 5px; list-style: none; margin: 0; padding: 0; }
+.calendar-list li { min-width: 0; display: grid; grid-template-columns: 172px minmax(0, 1fr); gap: 0 12px; align-items: baseline; font-size: 17px; line-height: 1.25; }
+.calendar-list time { opacity: .76; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.calendar-list strong { overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-list small { grid-column: 2; overflow: hidden; opacity: .68; text-overflow: ellipsis; white-space: nowrap; }
