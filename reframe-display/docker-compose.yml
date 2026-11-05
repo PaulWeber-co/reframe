@@ -1,0 +1,55 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: reframe-display_web_1
+      APP_PORT: 7777
+
+  web:
+    image: ghcr.io/paulweber-co/reframe:0.1.0
+    restart: on-failure
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
+      - ${APP_DATA_DIR}/media:/media
+      - ${APP_DATA_DIR}/run:/run/reframe
+      - ${APP_DATA_DIR}/airplay:/run/shairport-sync:ro
+    environment:
+      REFRAME_ALLOWED_HOSTS: ${DEVICE_DOMAIN_NAME}
+    security_opt:
+      - no-new-privileges:true
+
+  # Chromium full screen on this machine's display, brightness, webcam sensor.
+  # Shares the dashboard's network so the page loads from 127.0.0.1. It needs
+  # the machine's display and input devices, hence privileged.
+  kiosk:
+    image: ghcr.io/paulweber-co/reframe:0.1.0
+    command: kiosk
+    restart: on-failure
+    network_mode: "service:web"
+    privileged: true
+    tty: true
+    depends_on:
+      - web
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
+      - ${APP_DATA_DIR}/run:/run/reframe
+      - /dev:/dev
+
+  # AirPlay 2 speaker. Needs the host network for discovery and uses the
+  # machine's avahi-daemon, which umbrelOS runs.
+  airplay:
+    image: mikebrady/shairport-sync:5.5.2
+    restart: on-failure
+    network_mode: host
+    cap_add:
+      - SYS_NICE
+    devices:
+      - /dev/snd:/dev/snd
+    environment:
+      ENABLE_AVAHI: "0"
+    volumes:
+      - ${APP_DATA_DIR}/airplay:/run/shairport-sync
+      - ${APP_DATA_DIR}/shairport-sync.conf:/etc/shairport-sync.conf:ro
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/avahi-daemon:/var/run/avahi-daemon

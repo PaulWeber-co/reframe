@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Reframe">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5fa8c9"/>
+      <stop offset="1" stop-color="#14374a"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".12"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <circle cx="190" cy="70" r="30" fill="#ffd58a" opacity=".9"/>
+  <path d="M0 190c40-30 80-34 128-14s88 14 128-10v90H0z" fill="#0b2433" opacity=".55"/>
+  <rect x="52" y="64" width="152" height="112" rx="22" fill="url(#glass)" stroke="#fff" stroke-opacity=".7" stroke-width="5"/>
+  <path d="M84 128h40M84 148h72" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".9"/>
+  <circle cx="170" cy="112" r="9" fill="#fff" opacity=".9"/>
+</svg>

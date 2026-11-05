@@ -1,0 +1,38 @@
+manifestVersion: 1
+id: reframe-display
+category: automation
+name: Reframe Display
+version: "0.1.0"
+tagline: Your old laptop's screen as a wall dashboard
+description: >-
+  Reframe Display is Reframe plus everything it needs to take over the screen
+  of the machine Umbrel runs on: a full-screen kiosk on the laptop's display,
+  brightness that follows the room (optional webcam sensor, no picture is ever
+  stored), a schedule that dims or switches the screen off at night, and an
+  AirPlay speaker that shows cover and title on the wall.
+
+
+  Made for the old laptop in the drawer: the screen that would otherwise stay
+  dark becomes the nicest part of your home server.
+
+
+  Please read the notes first: driving a screen from a container needs a
+  privileged container, and it depends on your hardware. The project README has
+  a short checklist, and the plain dashboard ("Reframe") works everywhere.
+developer: Paul Weber
+website: https://github.com/PaulWeber-co/reframe
+dependencies: []
+repo: https://github.com/PaulWeber-co/reframe
+support: https://github.com/PaulWeber-co/reframe/issues
+port: 7777
+icon: https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/assets/icon.svg
+gallery:
+  - https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/screenshots/dashboard-day.jpg
+  - https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/screenshots/control.jpg
+  - https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/screenshots/dashboard-music.jpg
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+releaseNotes: First release.
+submitter: Paul Weber
+submission: https://github.com/PaulWeber-co/reframe

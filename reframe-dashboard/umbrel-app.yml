@@ -1,0 +1,37 @@
+manifestVersion: 1
+id: reframe-dashboard
+category: automation
+name: Reframe
+version: "0.1.0"
+tagline: A calm wall dashboard for any screen
+description: >-
+  Reframe turns a screen into a glassy wall dashboard: the clock, weather,
+  your calendar, to-dos, the state of your services and what is playing over
+  AirPlay, in front of slow background video or soft gradients.
+
+
+  This is the dashboard on its own. Open it in any browser, or put it on a
+  tablet or a TV. It lives in the Umbrel web interface, so Umbrel's login
+  protects it. To show it on the screen of the machine Umbrel runs on, install
+  "Reframe Display" instead.
+
+
+  Everything is set up in the browser. Weather needs no account. A calendar,
+  Home Assistant, Immich and a traffic estimate are optional.
+developer: Paul Weber
+website: https://github.com/PaulWeber-co/reframe
+dependencies: []
+repo: https://github.com/PaulWeber-co/reframe
+support: https://github.com/PaulWeber-co/reframe/issues
+port: 7777
+icon: https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/assets/icon.svg
+gallery:
+  - https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/screenshots/dashboard-day.jpg
+  - https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/screenshots/dashboard-evening.jpg
+  - https://raw.githubusercontent.com/PaulWeber-co/reframe/main/docs/screenshots/dashboard-music.jpg
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+releaseNotes: First release.
+submitter: Paul Weber
+submission: https://github.com/PaulWeber-co/reframe

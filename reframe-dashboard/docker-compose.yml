@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: reframe-dashboard_web_1
+      APP_PORT: 7777
+
+  web:
+    image: ghcr.io/paulweber-co/reframe:0.1.0
+    restart: on-failure
+    volumes:
+      # The entrypoint takes care of the folder's owner, so a fresh install just works
+      - ${APP_DATA_DIR}/data:/data
+      # Your own background clips: see "Your own video" in the README
+      - ${APP_DATA_DIR}/media:/media
+    environment:
+      REFRAME_ALLOWED_HOSTS: ${DEVICE_DOMAIN_NAME}
+    security_opt:
+      - no-new-privileges:true
