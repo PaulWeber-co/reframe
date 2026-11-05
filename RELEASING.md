@@ -13,6 +13,10 @@ For the maintainer. One release is one tag; everything else follows from it.
 4. **About** (the gear next to the repository description): the description and
    topics, and **Settings → General → Social preview**: upload
    `docs/assets/social-preview.png`.
+5. **Settings → Pages**: under *Build and deployment* choose **Source: GitHub
+   Actions**. The **Pages** workflow then publishes the `site/` folder to
+   <https://paulweber-co.github.io/reframe/> on every change to it. Put that
+   address in the repository's *Website* field (About).
 
 ## Every release
 

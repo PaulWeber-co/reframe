@@ -149,7 +149,7 @@ If you try the kiosk or the Umbrel app, a short report helps everyone:
 
 ## More
 
-- [Installation](docs/installation.md) · [Configuration](docs/configuration.md) · [Hardware](docs/hardware.md) · [Troubleshooting](docs/troubleshooting.md)
+- [Website](https://paulweber-co.github.io/reframe/) · [Installation](docs/installation.md) · [Configuration](docs/configuration.md) · [Hardware](docs/hardware.md) · [Troubleshooting](docs/troubleshooting.md)
 - [umbrelOS](docs/umbrel.md) · [How it fits together](docs/architecture.md) · [Writing a tile](docs/widgets.md)
 - [Security](SECURITY.md) · [Attribution](ATTRIBUTION.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [Releasing](RELEASING.md)
 
