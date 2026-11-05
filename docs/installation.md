@@ -18,6 +18,9 @@ until a tile is set up; the small "Example" mark on a tile tells you which.
 Put it on a tablet, a TV, or a second monitor by opening that address in a
 browser and making the browser full screen.
 
+To build the image from this folder instead of pulling it, add `--build`:
+`docker compose up -d --build`.
+
 Update with `git pull && docker compose pull && docker compose up -d`.
 Your settings and to-dos live in the `data` volume and survive updates.
 
