@@ -1,0 +1,107 @@
+# Reframe on any machine with Docker.
+#
+#   docker compose up -d                      the dashboard at http://localhost:7777
+#   docker compose --profile kiosk up -d      ... and on this machine's own display
+#   docker compose --profile airplay up -d    ... plus an AirPlay speaker
+#   docker compose --profile services up -d   ... plus the Services tile
+#
+# Profiles combine: --profile kiosk --profile airplay. Settings live in the
+# browser (http://localhost:7777/setup); environment variables below are only
+# for what you want to pin from here (see docs/configuration.md).
+name: reframe
+
+x-image: &image
+  image: ghcr.io/paulweber-co/reframe:latest
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+
+services:
+  # The dashboard. No hardware, no privileges: it runs anywhere.
+  reframe:
+    <<: *image
+    restart: unless-stopped
+    ports:
+      - "7777:7777"
+    environment:
+      REFRAME_DEMO: "${REFRAME_DEMO:-0}"
+      REFRAME_ALLOWED_HOSTS: "${REFRAME_ALLOWED_HOSTS:-}"
+    volumes:
+      - data:/data
+      - ./media:/media
+      - run:/run/reframe
+      - airplay:/run/shairport-sync:ro
+    security_opt:
+      - no-new-privileges:true
+
+  # The kiosk: Chromium full screen on this laptop's display, plus brightness
+  # and the optional webcam sensor. It shares the dashboard's network (so the
+  # page loads from 127.0.0.1) and its data. It needs the machine's display,
+  # input and sound devices, so it runs privileged: see docs/hardware.md.
+  kiosk:
+    <<: *image
+    profiles: ["kiosk"]
+    command: kiosk
+    restart: unless-stopped
+    network_mode: "service:reframe"
+    privileged: true
+    tty: true
+    depends_on:
+      - reframe
+    volumes:
+      - data:/data
+      - run:/run/reframe
+      - /dev:/dev
+
+  # An AirPlay 2 speaker on this machine's sound card. Needs the host network
+  # for discovery, and the machine's avahi-daemon (the one that makes
+  # reframe.local work) instead of a second one.
+  airplay:
+    image: mikebrady/shairport-sync:5.5.2
+    profiles: ["airplay"]
+    network_mode: host
+    restart: unless-stopped
+    cap_add:
+      - SYS_NICE
+    devices:
+      - /dev/snd:/dev/snd
+    environment:
+      ENABLE_AVAHI: "0"
+    volumes:
+      - ./docker/shairport-sync.conf:/etc/shairport-sync.conf:ro
+      - airplay:/run/shairport-sync
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/avahi-daemon:/var/run/avahi-daemon
+    logging:
+      options:
+        max-size: "200k"
+        max-file: "5"
+
+  # Lists the containers of this machine for the Services tile. The Docker
+  # socket is root-equivalent: mounting it ":ro" does not make the API
+  # read-only. That is why this is a container of its own, with no network and
+  # no capabilities, that only runs "docker ps / stats / inspect", and why the
+  # dashboard never gets near the socket. For a hard limit, put a socket proxy
+  # such as tecnativa/docker-socket-proxy in between (docs/configuration.md).
+  services:
+    <<: *image
+    profiles: ["services"]
+    command: services
+    restart: unless-stopped
+    network_mode: none
+    read_only: true
+    user: root
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    volumes:
+      - run:/run/reframe
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  data:
+  run:
+  airplay:
