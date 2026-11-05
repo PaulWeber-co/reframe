@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "query": "alexanderplatz 1 10178 berlin",
+    "queryType": "NON_NEAR",
+    "queryTime": 64,
+    "numResults": 1,
+    "offset": 0,
+    "totalResults": 1,
+    "fuzzyLevel": 1
+  },
+  "results": [
+    {
+      "type": "Point Address",
+      "id": "DE/PAD/p0/0000001",
+      "score": 13.4728212357,
+      "matchConfidence": {
+        "score": 1
+      },
+      "address": {
+        "streetNumber": "1",
+        "streetName": "Alexanderplatz",
+        "municipalitySubdivision": "Mitte",
+        "municipality": "Berlin",
+        "countrySecondarySubdivision": "Berlin",
+        "countrySubdivision": "Berlin",
+        "countrySubdivisionName": "Berlin",
+        "countrySubdivisionCode": "BE",
+        "postalCode": "10178",
+        "countryCode": "DE",
+        "country": "Deutschland",
+        "countryCodeISO3": "DEU",
+        "freeformAddress": "Alexanderplatz 1, 10178 Berlin",
+        "localName": "Berlin"
+      },
+      "position": {
+        "lat": 52.52196,
+        "lon": 13.41331
+      },
+      "viewport": {
+        "topLeftPoint": {
+          "lat": 52.52286,
+          "lon": 13.4118
+        },
+        "btmRightPoint": {
+          "lat": 52.52106,
+          "lon": 13.41482
+        }
+      },
+      "entryPoints": [
+        {
+          "type": "main",
+          "position": {
+            "lat": 52.5221,
+            "lon": 13.4132
+          }
+        }
+      ]
+    }
+  ]
+}
